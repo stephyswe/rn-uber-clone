@@ -1,4 +1,3 @@
-import { useNavigation } from '@react-navigation/native';
 import React from 'react';
 import { StyleSheet, View, SafeAreaView, Image } from 'react-native';
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
@@ -6,7 +5,7 @@ import tw from 'tailwind-react-native-classnames';
 import NavOptions from '../components/NavOptions';
 import { GOOGLE_MAPS_APIKEY } from '@env';
 import { useDispatch } from 'react-redux';
-import { setDestination } from '../slices/navSlice';
+import { setDestination, setOrigin } from '../slices/navSlice';
 
 const HomeScreen = () => {
   const dispatch = useDispatch();
