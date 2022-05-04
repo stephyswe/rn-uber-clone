@@ -4,6 +4,13 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import tw from 'tailwind-react-native-classnames';
 import { Icon } from 'react-native-elements';
 import { useNavigation } from '@react-navigation/native';
+import { selectTravelTimeInformation } from '../slices/navSlice';
+import { useSelector } from 'react-redux';
+
+if (typeof Intl === 'undefined') {
+  require('intl');
+  require('intl/locale-data/jsonp/en-GB'); // may be different for you
+}
 
 const data = [
   {
@@ -26,9 +33,13 @@ const data = [
   }
 ];
 
+// if we have SURGE pricing, this goes up
+const SURGE_CHARGE_RATE = 1.5;
+
 const RideOptionsCard = () => {
   const navigation = useNavigation();
   const [selected, setSelected] = useState(null);
+  const travelTimeInformation = useSelector(selectTravelTimeInformation);
   return (
     <SafeAreaView style={tw`bg-white flex-grow`}>
       <View>
@@ -38,7 +49,9 @@ const RideOptionsCard = () => {
         >
           <Icon name="chevron-left" type="fontawesome" />
         </TouchableOpacity>
-        <Text style={tw`text-center py-2 text-xl`}>Select a Ride</Text>
+        <Text style={tw`text-center py-2 text-xl`}>
+          Select a Ride - {travelTimeInformation?.distance.text}
+        </Text>
       </View>
 
       <FlatList
@@ -53,8 +66,6 @@ const RideOptionsCard = () => {
           >
             <Image
               style={{
-                minWidth: 100,
-                maxWidth: 100,
                 width: 100,
                 height: 100,
                 resizeMode: 'contain'
@@ -63,13 +74,21 @@ const RideOptionsCard = () => {
             />
             <View style={tw`-ml-6`}>
               <Text style={tw`text-xl font-semibold`}>{title}</Text>
-              <Text>time</Text>
+              <Text>{travelTimeInformation?.duration?.text} </Text>
             </View>
-            <Text style={tw`text-xl`}>$99</Text>
+            <Text style={tw`text-xl`}>
+              {new Intl.NumberFormat('en-gb', {
+                style: 'currency',
+                currency: 'GBP'
+              }).format(
+                (travelTimeInformation?.duration.value * SURGE_CHARGE_RATE * multiplier) /
+                  100
+              )}
+            </Text>
           </TouchableOpacity>
         )}
       />
-      <View>
+      <View style={tw`mt-auto border-t border-gray-200`}>
         <TouchableOpacity
           disabled={!selected}
           style={tw`bg-black py-3 m-3 ${!selected && 'bg-gray-300'}`}
